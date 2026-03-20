@@ -1,0 +1,9 @@
+# Cypress
+cypress.env.json
+
+# Dependências
+node_modules/
+
+# Videos e Screenshots gerados pelo Cypress
+cypress/videos/
+cypress/screenshots/
