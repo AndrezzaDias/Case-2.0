@@ -3,8 +3,8 @@ import { faker } from '@faker-js/faker/locale/pt_BR'
 describe('Conteúdos', () => {
   beforeEach(() => {
     cy.login()
-    cy.get('.md\\:gap-0 > :nth-child(1) > .relative > .flex').type('Teste QA')
-    cy.get('.flex.items-center.gap-2').contains('Teste QA').click()
+    cy.get('.md\\:gap-0 > :nth-child(1) > .relative > .flex').type('Empresa And Qa')
+    cy.get('.flex.items-center.gap-2').contains('Empresa And Qa').click()
     cy.url().should('include', '/sites')
   })
 
@@ -24,7 +24,9 @@ describe('Conteúdos', () => {
       cy.get('#image-input').selectFile('cypress/fixtures/imagem-teste.jpg.png', { force: true })
       cy.get('#dynamic-form > :nth-child(2) > .relative > .flex').type(titulo)
       cy.get(':nth-child(3) > .flex-col > .h-10').click()
-      cy.contains('[role="option"]', 'Lançamentos / Guia de Compra').click()
+      // Categoria precisa existir na conta "Empresa And Qa". "Lançamentos / Guia de Compra"
+      // era da conta antiga; aqui usamos uma categoria que existe na lista.
+      cy.contains('[role="option"]', 'Guia de Compra').click()
       cy.get('iframe[id^="tiny-react"]').then(($iframe) => {
         cy.wrap($iframe.contents().find('#tinymce'))
           .focus()
@@ -32,11 +34,12 @@ describe('Conteúdos', () => {
           .type(conteudo, { force: true })
       })
       cy.get(':nth-child(6) > .flex-col > .h-10').click()
-      cy.contains('[role="option"]', 'Qa').click()
+      // Autor precisa existir na conta. "Qa" era da conta antiga; usamos um autor da lista.
+      cy.contains('[role="option"]', 'Andreza').click()
       cy.get('[data-cy="input-slug"]').clear().type(slug)
       cy.get('.border.flex-col > .inline-flex').click()
       cy.url().should('include', '/conteudos')
-      cy.contains('Lançamentos / Guia de Compra').should('be.visible')
+      cy.contains('Guia de Compra').should('be.visible')
     })
   })
 })
