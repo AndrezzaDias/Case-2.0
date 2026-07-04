@@ -30,5 +30,17 @@ Cypress.Commands.add('login', () => {
     cy.get('[data-cy="email-input"]').type(Cypress.env('EMAIL'))
     cy.get('[data-cy="password-input"]').type(Cypress.env('PASSWORD'))
     cy.get('[data-cy="enter-button"]').click()
-    cy.url().should('include', '/contas')   
+    cy.url().should('include', '/contas')
+})
+
+Cypress.Commands.add('acessarContaTeste', () => {
+    cy.login()
+    cy.get('.md\\:gap-0 > :nth-child(1) > .relative > .flex').type('Testes Automatizados QA [Não Alterar]')
+    cy.wait(1000)
+    cy.get('.min-w-\\[200px\\] > .items-center').click()
+})
+
+Cypress.Commands.add('acessarPainelDoSite', () => {
+    cy.acessarContaTeste()
+    cy.contains('button', 'Painel de Controle').click()
 })

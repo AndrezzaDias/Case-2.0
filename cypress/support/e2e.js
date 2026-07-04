@@ -15,3 +15,11 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+
+// Ignora erros de scripts de terceiros (New Relic, Clarity, Google Analytics)
+// que tentam usar postMessage após o Cypress limpar a página entre testes.
+Cypress.on('uncaught:exception', (err) => {
+    if (err.message.includes('postMessage')) {
+        return false
+    }
+})
