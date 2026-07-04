@@ -29,12 +29,11 @@ Headless (sem interface):
 npx cypress run
 ```
 
-Rodar uma pasta específica:
+Rodar um spec específico:
 ```bash
-npx cypress run --spec "cypress/e2e/01-login/**"
-npx cypress run --spec "cypress/e2e/02-contas/**"
-npx cypress run --spec "cypress/e2e/03-sites/**"
-npx cypress run --spec "cypress/e2e/04-conteudos/**"
+npx cypress run --spec "cypress/e2e/login.cy.js"
+npx cypress run --spec "cypress/e2e/criar-site.cy.js"
+npx cypress run --spec "cypress/e2e/envio-lead.cy.js"
 ```
 ---
 ## 📁 Estrutura do Projeto
@@ -42,19 +41,18 @@ npx cypress run --spec "cypress/e2e/04-conteudos/**"
 AUTOMAÇÃO/
 ├── cypress/
 │   ├── e2e/
-│   │   ├── 01-login/
-│   │   │   └── login.cy.js
-│   │   ├── 02-contas/
-│   │   │   └── buscar-conta.cy.js
-│   │   ├── 03-sites/
-│   │   │   └── sites.cy.js
-│   │   └── 04-conteudos/
-│   │       ├── cadastrando-conteudos.cy.js
-│   │       └── cadastrando-seminovos.cy.js
+│   │   ├── login.cy.js
+│   │   ├── sidebar.cy.js
+│   │   ├── workspace-site.cy.js
+│   │   ├── sidebar-painel-controle.cy.js
+│   │   ├── contas.cy.js
+│   │   ├── criar-site.cy.js
+│   │   └── envio-lead.cy.js
 │   ├── fixtures/
 │   │   └── imagem-teste.png
 │   └── support/
-│       └── commands.js
+│       ├── commands.js
+│       └── e2e.js
 ├── cypress.config.js
 ├── cypress.env.json   ← não versionado
 ├── .gitignore
@@ -68,6 +66,19 @@ AUTOMAÇÃO/
 | Comando | Descrição |
 |---|---|
 | `cy.login()` | Realiza login com as credenciais do `cypress.env.json` |
+| `cy.acessarContaTeste()` | Faz login, busca e acessa a conta "Testes Automatizados QA [Não Alterar]" |
+| `cy.acessarPainelDoSite()` | Acessa a conta de teste e entra no Painel de Controle do site "Site do Zero" |
+
+---
+
+##### Configurações relevantes (`cypress.config.js`)
+
+| Opção | Motivo |
+|---|---|
+| `chromeWebSecurity: false` | Necessário para testes que navegam entre domínios diferentes (ex: site público → painel admin), como em `envio-lead.cy.js` |
+| `pageLoadTimeout: 120000` | Dá mais margem para o carregamento em transições entre domínios |
+
+Erros de scripts de terceiros (New Relic, Clarity, Google Analytics) que disparam `postMessage` após o Cypress limpar a página entre testes são ignorados via `Cypress.on('uncaught:exception', ...)` em `cypress/support/e2e.js`.
 
 ---
 
@@ -104,78 +115,136 @@ Feature: Login no sistema
 
 ---
 
-##### Feature: Contas
+##### Feature: Sidebar - Área Administrativa
 ```gherkin
-Feature: Buscar conta
+Feature: Validação da sidebar da Área Administrativa
 
   Como um usuário autenticado
-  Quero buscar uma conta pelo nome
-  Para acessar os sites dessa conta
+  Quero ver todos os elementos da sidebar administrativa
+  Para garantir que nada quebrou em um deploy
 
-  Scenario: Buscar conta por nome com sucesso
+  Scenario: Exibição do logo e label
     Given que estou logado na plataforma
-    And estou na página de contas
-    When busco pelo nome "Teste QA"
-    And clico na conta encontrada
-    Then devo ser redirecionado para a página de sites da conta
-    And a URL deve conter "/sites"
+    Then devo ver o logo da Autódromo
+    And devo ver o label "Área Administrativa"
+
+  Scenario: Exibição dos itens principais do menu
+    Then devo ver os itens Contas, Administradores, Tipos de conteúdo, Integradores e Paddock
+
+  Scenario: Exibição do menu Templates com seus submenus
+    When clico no menu "Templates"
+    Then devo ver os itens Sites, Páginas e Módulos
+
+  Scenario: Exibição da seção Outros
+    Then devo ver os itens Central de Ajuda e Sair
 ```
 
-
-##### Feature: Conteúdos
+##### Feature: Sidebar - Workspace do Site
 ```gherkin
-Feature: Cadastro de Conteúdo de Blog
+Feature: Validação da sidebar de Workspace e da tela de Sites
+
+  Como um usuário autenticado em uma conta
+  Quero ver todos os elementos da sidebar de Workspace
+  Para garantir que nada quebrou em um deploy
+
+  Scenario: Exibição dos itens do menu Workspace
+    Given que acessei a conta de teste
+    Then devo ver os itens Sites, Conteúdos, Unidades, Configurações, Integradores e Paddock
+
+  Scenario: Exibição do menu Leads com seus submenus
+    When clico no menu "Leads"
+    Then devo ver os itens Listagem e Equipes
+
+  Scenario: Exibição dos itens da Área Administrativa
+    Then devo ver os itens Contas, Administradores, Templates e Paddock
+
+  Scenario: Exibição dos elementos da tela de Sites
+    Then devo ver o título, o botão "Novo site", a busca, os filtros e o card do site existente
+```
+
+##### Feature: Sidebar - Painel de Controle do Site
+```gherkin
+Feature: Validação da sidebar do Painel de Controle de um site
 
   Como um usuário autenticado
-  Quero cadastrar um novo conteúdo de Blog
-  Para que ele fique disponível na plataforma
+  Quero ver todos os elementos da sidebar do Painel de Controle
+  Para garantir que nada quebrou em um deploy
 
-  Scenario: Cadastrar conteúdo de Blog com sucesso (executa 3 vezes com dados aleatórios)
-    Given que estou logado na plataforma
-    And busquei pela conta "Teste QA"
-    And estou na página de Conteúdos
-    And cliquei na categoria "Blog"
-    And cliquei em "Novo item"
-    When preencho o nome com um valor aleatório
-    And faço upload da imagem de capa
-    And preencho o título com um valor aleatório
-    And seleciono a categoria "Lançamentos / Guia de Compra"
-    And preencho o conteúdo da postagem com um texto aleatório
-    And seleciono o autor "Qa"
-    And preencho o slug com um valor aleatório
-    And clico em "Salvar"
-    Then devo ser redirecionado para a lista de conteúdos
-    And o conteúdo criado deve aparecer na listagem com o nome preenchido
-    And a categoria "Lançamentos / Guia de Compra" deve estar visível na listagem
+  Scenario: Exibição do nome do site e itens de configuração
+    Given que acessei o Painel de Controle do site de teste
+    Then devo ver o nome do site e os itens Painel de controle, Conteúdos, Informações, Unidades, WhatsApp, Integrações e Domínio
+
+  Scenario: Exibição do menu Formulários com seus submenus
+    When clico no menu "Formulários"
+    Then devo ver os itens Cookies, Scripts e Ações sensíveis
+
+  Scenario: Exibição da seção Global
+    Then devo ver os itens Header e Footer
 ```
-### Feature: Conteúdos — Seminovos
+
+---
+
+##### Feature: Contas (Smoke Test)
 ```gherkin
-Feature: Cadastro de Conteúdo de Seminovos
+Feature: Consistência da tela de Contas
 
   Como um usuário autenticado
-  Quero cadastrar um novo conteúdo de Seminovos
-  Para que ele fique disponível na plataforma
+  Quero garantir que os números e a listagem de contas carregam corretamente
+  Para pegar quebras em um deploy
 
-  Scenario: Cadastrar conteúdo de Seminovos com sucesso
+  Scenario: Consistência do total de contas
     Given que estou logado na plataforma
-    And busquei pela conta "Teste QA"
-    And estou na página de Conteúdos
-    And cliquei na categoria "Seminovos"
-    And cliquei em "Novo item"
-    When preencho o título com um valor aleatório
-    And preencho a descrição com um valor aleatório
-    And preencho o preço com um valor aleatório
-    And faço upload da imagem de capa
-    And preencho a marca com um valor aleatório
-    And preencho o modelo do veículo com um valor aleatório
-    And preencho o ano com um valor aleatório
-    And preencho o KM com um valor aleatório
-    And preencho as observações do vendedor com um texto aleatório
-    And preencho o slug com um valor aleatório
-    And clico em "Salvar"
-    Then devo ser redirecionado para a lista de conteúdos
-    And o conteúdo criado deve aparecer na listagem com o título preenchido
+    Then o valor de "Total de contas" deve ser igual à soma de "Contas de clientes" e "Total de contas de teste"
+
+  Scenario: Carregamento da tabela de contas
+    Then a tabela de contas deve conter ao menos uma linha
 ```
+
+---
+
+##### Feature: Criar site
+```gherkin
+Feature: Criação e exclusão de site
+
+  Como um usuário autenticado
+  Quero criar um novo site do zero
+  Para garantir que o fluxo de criação de sites funciona
+
+  Scenario: Criar e excluir um site com sucesso
+    Given que acessei a conta de teste
+    When clico em "Novo site"
+    And preencho o título do site
+    And avanço para a próxima etapa
+    And seleciono o template vazio
+    Then devo ser redirecionado para o editor do site ("/builder")
+    And devo ver "Personalize seu Header"
+    When volto para o Painel de Controle e salvo as alterações
+    Then o site deve aparecer com o nome correto
+    When excluo o site criado, confirmando o nome
+    Then devo ver a mensagem de exclusão com sucesso
+```
+
+##### Feature: Envio de Lead
+```gherkin
+Feature: Envio de lead pelo site público
+
+  Como um visitante do site
+  Quero preencher o formulário de conversão de lead
+  Para que meus dados cheguem até a equipe comercial
+
+  Scenario: Enviar lead com sucesso e conferir na listagem
+    Given que estou no site público do cliente
+    When aceito os cookies
+    And preencho Nome, E-mail e Telefone
+    And marco a preferência de contato por e-mail
+    And clico em "Enviar"
+    Then a requisição de conversão deve retornar sucesso (200/201/202)
+    And o corpo enviado deve conter o nome, e-mail e telefone informados
+    And devo ver a mensagem "Obrigado!"
+    When acesso a listagem de Leads no painel admin
+    Then o lead enviado deve aparecer na listagem
+```
+
 ---
 
 #### Dependências
