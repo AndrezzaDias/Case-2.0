@@ -31,9 +31,15 @@ npx cypress run
 
 Rodar um spec específico:
 ```bash
-npx cypress run --spec "cypress/e2e/login.cy.js"
-npx cypress run --spec "cypress/e2e/criar-site.cy.js"
-npx cypress run --spec "cypress/e2e/envio-lead.cy.js"
+npx cypress run --spec "cypress/e2e/login/login.cy.js"
+npx cypress run --spec "cypress/e2e/contas/sites/novoSite.cy.js"
+npx cypress run --spec "cypress/e2e/contas/leads/envioDeLead.cy.js"
+```
+
+Rodar um domínio inteiro:
+```bash
+npx cypress run --spec "cypress/e2e/layout/**"
+npx cypress run --spec "cypress/e2e/contas/**"
 ```
 ---
 ## 📁 Estrutura do Projeto
@@ -41,13 +47,18 @@ npx cypress run --spec "cypress/e2e/envio-lead.cy.js"
 AUTOMAÇÃO/
 ├── cypress/
 │   ├── e2e/
-│   │   ├── login.cy.js
-│   │   ├── sidebar.cy.js
-│   │   ├── workspace-site.cy.js
-│   │   ├── sidebar-painel-controle.cy.js
-│   │   ├── contas.cy.js
-│   │   ├── criar-site.cy.js
-│   │   └── envio-lead.cy.js
+│   │   ├── login/
+│   │   │   └── login.cy.js
+│   │   ├── layout/
+│   │   │   ├── sidebarAreaAdministrativa.cy.js
+│   │   │   ├── sidebarWorkspaceSite.cy.js
+│   │   │   └── sidebarPainelDeControle.cy.js
+│   │   └── contas/
+│   │       ├── contas.cy.js
+│   │       ├── sites/
+│   │       │   └── novoSite.cy.js
+│   │       └── leads/
+│   │           └── envioDeLead.cy.js
 │   ├── fixtures/
 │   │   └── imagem-teste.png
 │   └── support/
@@ -85,6 +96,7 @@ Erros de scripts de terceiros (New Relic, Clarity, Google Analytics) que dispara
 #### Cenários de Teste
 ---
 ##### Feature: Login
+`cypress/e2e/login/login.cy.js`
 ```gherkin
 Feature: Login no sistema
 
@@ -116,6 +128,7 @@ Feature: Login no sistema
 ---
 
 ##### Feature: Sidebar - Área Administrativa
+`cypress/e2e/layout/sidebarAreaAdministrativa.cy.js`
 ```gherkin
 Feature: Validação da sidebar da Área Administrativa
 
@@ -140,6 +153,7 @@ Feature: Validação da sidebar da Área Administrativa
 ```
 
 ##### Feature: Sidebar - Workspace do Site
+`cypress/e2e/layout/sidebarWorkspaceSite.cy.js`
 ```gherkin
 Feature: Validação da sidebar de Workspace e da tela de Sites
 
@@ -163,6 +177,7 @@ Feature: Validação da sidebar de Workspace e da tela de Sites
 ```
 
 ##### Feature: Sidebar - Painel de Controle do Site
+`cypress/e2e/layout/sidebarPainelDeControle.cy.js`
 ```gherkin
 Feature: Validação da sidebar do Painel de Controle de um site
 
@@ -185,6 +200,7 @@ Feature: Validação da sidebar do Painel de Controle de um site
 ---
 
 ##### Feature: Contas (Smoke Test)
+`cypress/e2e/contas/contas.cy.js`
 ```gherkin
 Feature: Consistência da tela de Contas
 
@@ -203,6 +219,7 @@ Feature: Consistência da tela de Contas
 ---
 
 ##### Feature: Criar site
+`cypress/e2e/contas/sites/novoSite.cy.js`
 ```gherkin
 Feature: Criação e exclusão de site
 
@@ -225,6 +242,7 @@ Feature: Criação e exclusão de site
 ```
 
 ##### Feature: Envio de Lead
+`cypress/e2e/contas/leads/envioDeLead.cy.js`
 ```gherkin
 Feature: Envio de lead pelo site público
 

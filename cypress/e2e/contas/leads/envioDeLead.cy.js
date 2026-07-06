@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker/locale/pt_BR'
 
 describe('Envio de Lead - Site', () => {
     const nome = faker.person.fullName()
-    const email = faker.internet.email()
+    const email = faker.internet.email().toLowerCase()
     const telefone = '(11) 99999-9999'
 
     it('Envia um lead pelo site e confere que aparece na listagem de Leads', () => {
@@ -14,8 +14,9 @@ describe('Envio de Lead - Site', () => {
         cy.get('[name="name"]').type(nome)
         cy.get('[name="email"]').type(email)
         cy.get('[name="phone"]').type(telefone)
-        cy.get('input[name="preferencia_contato[]"][value="email"]').check()
-        cy.contains('button', 'Enviar').click()
+        cy.get(':nth-child(1) > [name="contactPreference[]"]').check()
+        cy.get(':nth-child(3) > [name="contactPreference[]"]').check()
+        cy.get('.sc-3675ea87-0').click()
 
         cy.wait('@enviarLead').then(({ request, response }) => {
             expect(response.statusCode).to.be.oneOf([200, 201, 202])
