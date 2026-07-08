@@ -1,5 +1,7 @@
+import { faker } from '@faker-js/faker/locale/pt_BR'
+
 describe('Criar site', () => {
-    const NOME_SITE = 'Novo site automação apaga'
+    const NOME_SITE = `Novo site automação apaga ${faker.string.alphanumeric(8)}`
 
     beforeEach(() => {
         cy.acessarContaTeste()
