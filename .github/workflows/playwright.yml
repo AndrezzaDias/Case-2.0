@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      spec:
+        description: 'Spec para rodar (deixe vazio para rodar todos)'
+        required: false
+        default: ''
 
 jobs:
   playwright-run:
@@ -28,7 +33,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run Playwright tests
-        run: npm run pw:test
+        run: npx playwright test ${{ github.event.inputs.spec }}
         env:
           EMAIL: ${{ secrets.EMAIL_PRODUCAO }}
           PASSWORD: ${{ secrets.SENHA_PRODUCAO }}

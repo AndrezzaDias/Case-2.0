@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 async function globalSetup(config: FullConfig) {
-  const baseURL = process.env.BASE_URL ?? 'https://d1lsqmzxukegpl.cloudfront.net'
+  const baseURL = process.env.BASE_URL || 'https://d1lsqmzxukegpl.cloudfront.net'
 
   const browser = await chromium.launch({
     headless: true,

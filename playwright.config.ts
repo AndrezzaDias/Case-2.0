@@ -13,7 +13,7 @@ export default defineConfig({
   globalSetup: './tests/global-setup.ts',
 
   use: {
-    baseURL: process.env.BASE_URL ?? 'https://d1lsqmzxukegpl.cloudfront.net',
+    baseURL: process.env.BASE_URL || 'https://d1lsqmzxukegpl.cloudfront.net',
     storageState: 'tests/auth-state.json',
     viewport: { width: 1920, height: 1080 },
     ignoreHTTPSErrors: true,
