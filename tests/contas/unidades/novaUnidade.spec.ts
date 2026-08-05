@@ -20,6 +20,7 @@ test.describe('Nova Unidade', () => {
     ])
     await logotipoChooser.setFiles('tests/fixtures/imagem-teste.png')
     await page.getByRole('button', { name: 'Pular recorte' }).click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
 
     const [imagemExibicaoChooser] = await Promise.all([
       page.waitForEvent('filechooser'),
@@ -27,6 +28,8 @@ test.describe('Nova Unidade', () => {
     ])
     await imagemExibicaoChooser.setFiles('tests/fixtures/imagem-teste.png')
     await page.getByRole('button', { name: 'Pular recorte' }).click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+
     await page.locator('[name="name"]').fill(nomeUnidade)
     await page.locator('[name="displayName"]').fill(nomeUnidade)
     await page.locator('[name="cnpj"]').fill(faker.helpers.replaceSymbols('##.###.###/####-##'))
